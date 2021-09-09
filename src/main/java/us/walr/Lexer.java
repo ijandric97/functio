@@ -29,6 +29,7 @@ public class Lexer {
             new AbstractMap.SimpleEntry<>("null", NULL),
             new AbstractMap.SimpleEntry<>("print", PRINT),
             new AbstractMap.SimpleEntry<>("return", RETURN),
+            new AbstractMap.SimpleEntry<>("static", STATIC),
             new AbstractMap.SimpleEntry<>("super", SUPER),
             new AbstractMap.SimpleEntry<>("this", THIS),
             new AbstractMap.SimpleEntry<>("true", TRUE),

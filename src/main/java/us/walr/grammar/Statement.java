@@ -48,11 +48,13 @@ public abstract class Statement {
         final Token name;
         final us.walr.grammar.Expression.Variable superclass;
         final List<Statement.Function> methods;
+        final List<Statement.Function> staticMethods;
 
-        public Class(Token name, us.walr.grammar.Expression.Variable superclass, List<Statement.Function> methods) {
+        public Class(Token name, us.walr.grammar.Expression.Variable superclass, List<Statement.Function> methods, List<Statement.Function> staticMethods) {
             this.name = name;
             this.superclass = superclass;
             this.methods = methods;
+            this.staticMethods = staticMethods;
         }
 
         @Override
@@ -70,6 +72,10 @@ public abstract class Statement {
 
         public List<Statement.Function> getMethods() {
             return methods;
+        }
+
+        public List<Statement.Function> getStaticMethods() {
+            return staticMethods;
         }
     }
 

@@ -28,7 +28,7 @@ public record Token(Type type, String lexeme, Object literal, int line) {
 
         // Keywords.
         CLASS, ELSE, EXTENDS, FALSE, FUNCTION, FOR, IF, NULL,
-        PRINT, RETURN, SUPER, THIS, TRUE, VAR, WHILE,
+        PRINT, RETURN, STATIC, SUPER, THIS, TRUE, VAR, WHILE,
 
         EOF
     }

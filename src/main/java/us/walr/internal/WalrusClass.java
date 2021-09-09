@@ -4,8 +4,20 @@ import us.walr.Interpreter;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
-public record WalrusClass(String name, WalrusClass superclass, Map<String, WalrusFunction> methods) implements WalrusCallable {
+public class WalrusClass extends WalrusInstance implements WalrusCallable {
+    private final String name;
+    private final WalrusClass superclass;
+    private final Map<String, WalrusFunction> methods;
+
+    public WalrusClass(WalrusClass metaclass, String name, WalrusClass superclass, Map<String, WalrusFunction> methods) {
+        super(metaclass);
+        this.name = name;
+        this.superclass = superclass;
+        this.methods = methods;
+    }
+
     /**
      * @param name Name of the method we are searching for
      * @return Returns the method identifier (callee) which we can then execute
@@ -59,4 +71,32 @@ public record WalrusClass(String name, WalrusClass superclass, Map<String, Walru
         if (initializer == null) return 0;
         return initializer.numberOfArguments();
     }
+
+    public String name() {
+        return name;
+    }
+
+    public WalrusClass superclass() {
+        return superclass;
+    }
+
+    public Map<String, WalrusFunction> methods() {
+        return methods;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) return true;
+        if (obj == null || obj.getClass() != this.getClass()) return false;
+        var that = (WalrusClass) obj;
+        return Objects.equals(this.name, that.name) &&
+                Objects.equals(this.superclass, that.superclass) &&
+                Objects.equals(this.methods, that.methods);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, superclass, methods);
+    }
+
 }

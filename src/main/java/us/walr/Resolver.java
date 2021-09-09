@@ -139,6 +139,14 @@ class Resolver implements Expression.Visitor<Void>, Statement.Visitor<Void> {
             scopes.peek().put("super", true);
         }
 
+        // Resolve static methods
+        for (Statement.Function method : statement.getStaticMethods()) {
+            beginScope();
+            scopes.peek().put("this", true);
+            resolveFunction(method, FunctionType.METHOD);
+            endScope();
+        }
+
         beginScope();
         scopes.peek().put("this", true);
 

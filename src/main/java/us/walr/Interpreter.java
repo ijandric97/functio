@@ -172,6 +172,16 @@ public class Interpreter implements Expression.Visitor<Object>, Statement.Visito
             environment.define("super", superclass);
         }
 
+        // Map the static methods
+        Map<String, WalrusFunction> staticMethods = new HashMap<>();
+        for (Statement.Function method : statement.getStaticMethods()) {
+            WalrusFunction function = new WalrusFunction(method, environment, false);
+            staticMethods.put(method.getName().lexeme(), function);
+        }
+
+        // Add static methods to metaClass
+        WalrusClass metaClass = new WalrusClass(null, statement.getName().lexeme() + " metaclass", null, staticMethods);
+
         // Map the method definitions to a hashmap
         Map<String, WalrusFunction> methods = new HashMap<>();
         for (Statement.Function method : statement.getMethods()) {
@@ -180,7 +190,7 @@ public class Interpreter implements Expression.Visitor<Object>, Statement.Visito
         }
 
         // Finally, create an internal Walrus Class object
-        WalrusClass walrusClass = new WalrusClass(statement.getName().lexeme(), (WalrusClass) superclass, methods);
+        WalrusClass walrusClass = new WalrusClass(metaClass, statement.getName().lexeme(), (WalrusClass) superclass, methods);
 
         // If a superclass exists, that means that we had to create a local environment to reference the superclass
         // therefore we should "pop" that environment and get back to the original one
@@ -391,7 +401,7 @@ public class Interpreter implements Expression.Visitor<Object>, Statement.Visito
             }
             case STAR_STAR -> {
                 checkNumberOperands(expression.getOperator(), left, right);
-                return Math.pow((double)left, (double)right);
+                return Math.pow((double) left, (double) right);
             }
             case PERCENT -> {
                 checkNumberOperands(expression.getOperator(), left, right);

@@ -100,11 +100,20 @@ class Parser {
 
         // Parse the class body which consists of methods (attributes are defined in the init() function
         ph.advance(LEFT_BRACE, "Expect '{' before class body.");
+
         List<Statement.Function> methods = new ArrayList<>();
-        while (!ph.match(RIGHT_BRACE) && !ph.isEOF()) methods.add(function("method"));
+        List<Statement.Function> staticMethods = new ArrayList<>();
+
+        while (!ph.match(RIGHT_BRACE) && !ph.isEOF()) {
+            if (ph.matchAndAdvance(STATIC)) {
+                staticMethods.add(function("method"));
+            } else {
+                methods.add(function("method"));
+            }
+        }
         ph.advance(RIGHT_BRACE, "Expect '}' after class body.");
 
-        return new Statement.Class(name, superclass, methods);
+        return new Statement.Class(name, superclass, methods, staticMethods);
     }
 
     /**

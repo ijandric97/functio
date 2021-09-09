@@ -39,14 +39,15 @@ public class GenerateGrammarAST {
         // Generate the Statement.java file
         generateGrammarASTClass(outputDir, "Statement", Arrays.asList(
                 "Block      : List<Statement> statements",
-                "Class      : Token name, Expression.Variable superclass, List<Statement.Function> methods",
-                "Expression : Expression expression",
+                "Class      : Token name, us.walr.grammar.Expression.Variable superclass, " +
+                        "List<Statement.Function> methods, List<Statement.Function> staticMethods",
+                "Expression : us.walr.grammar.Expression expression",
                 "Function   : Token name, List<Token> params, List<Statement> body",
-                "If         : Expression condition, Statement thenBranch, Statement elseBranch",
-                "Print      : Expression expression",
-                "Return     : Token keyword, Expression value",
-                "Variable   : Token name, Expression initializer",
-                "While      : Expression condition, Statement body"
+                "If         : us.walr.grammar.Expression condition, Statement thenBranch, Statement elseBranch",
+                "Print      : us.walr.grammar.Expression expression",
+                "Return     : Token keyword, us.walr.grammar.Expression value",
+                "Variable   : Token name, us.walr.grammar.Expression initializer",
+                "While      : us.walr.grammar.Expression condition, Statement body"
         ));
     }
 
@@ -67,7 +68,7 @@ public class GenerateGrammarAST {
         writer.print("""
                 package us.walr.grammar;
                                 
-                import us.walr.records.Token;
+                import us.walr.internal.Token;
                                 
                 import java.util.List;
                                 
@@ -115,7 +116,7 @@ public class GenerateGrammarAST {
             String typeName = type.split(":")[0].trim();
             writer.println("\t\tR visit" + typeName + baseName + "(" + typeName + " " + baseName.toLowerCase() + ");");
 
-            if (i != typesSize-1) writer.println();
+            if (i != typesSize - 1) writer.println();
         }
 
         writer.println("\t}");
