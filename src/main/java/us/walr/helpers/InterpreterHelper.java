@@ -1,7 +1,7 @@
-package io.funct.helpers;
+package us.walr.helpers;
 
-import io.funct.exceptions.RuntimeError;
-import io.funct.internal.Token;
+import us.walr.exceptions.RuntimeError;
+import us.walr.internal.Token;
 
 public class InterpreterHelper {
     /**
@@ -65,7 +65,7 @@ public class InterpreterHelper {
      * @return The string representation of the object
      */
     public static String stringify(Object object) {
-        if (object == null) return "nil";
+        if (object == null) return "null";
 
         if (object instanceof Double) {
             String text = object.toString();

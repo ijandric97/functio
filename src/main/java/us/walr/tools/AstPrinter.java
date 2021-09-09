@@ -1,8 +1,8 @@
-package io.funct.tools;
+package us.walr.tools;
 
-import io.funct.grammar.Expression;
-import io.funct.grammar.Statement;
-import io.funct.internal.Token;
+import us.walr.grammar.Expression;
+import us.walr.grammar.Statement;
+import us.walr.internal.Token;
 
 import java.util.List;
 
@@ -182,7 +182,7 @@ class AstPrinter implements Expression.Visitor<String>, Statement.Visitor<String
     @Override
     public String visitFunctionStatement(Statement.Function statement) {
         StringBuilder builder = new StringBuilder();
-        builder.append("(fun ").append(statement.getName().lexeme()).append("(");
+        builder.append("(function ").append(statement.getName().lexeme()).append("(");
 
         for (Token param : statement.getParams()) {
             if (param != statement.getParams().get(0)) builder.append(" ");
@@ -323,12 +323,12 @@ class AstPrinter implements Expression.Visitor<String>, Statement.Visitor<String
     /**
      * Visitor for pretty printing the literal value tree node.
      *
-     * @param expression The Literal (number, string, boolean, nil) AST node.
+     * @param expression The Literal (number, string, boolean, null) AST node.
      * @return Infix or postfix representation of the Literal Value
      */
     @Override
     public String visitLiteralExpression(Expression.Literal expression) {
-        if (expression.getValue() == null) return "nil";
+        if (expression.getValue() == null) return "null";
         return expression.getValue().toString();
     }
 

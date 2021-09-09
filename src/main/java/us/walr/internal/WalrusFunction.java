@@ -1,13 +1,12 @@
-//> Functions lox-function
-package io.funct.internal;
+package us.walr.internal;
 
-import io.funct.Interpreter;
-import io.funct.exceptions.Return;
-import io.funct.grammar.Statement;
+import us.walr.Interpreter;
+import us.walr.exceptions.Return;
+import us.walr.grammar.Statement;
 
 import java.util.List;
 
-public record LoxFunction(Statement.Function declaration, Environment closure, boolean isInitializer) implements LoxCallable {
+public record WalrusFunction(Statement.Function declaration, Environment closure, boolean isInitializer) implements WalrusCallable {
 
     /**
      * Bind user object to an object (or sub environment)
@@ -15,10 +14,10 @@ public record LoxFunction(Statement.Function declaration, Environment closure, b
      * @param instance User Object instance
      * @return This same function except bound to the user defined object
      */
-    public LoxFunction bind(LoxInstance instance) {
+    public WalrusFunction bind(WalrusInstance instance) {
         Environment environment = new Environment(closure);
         environment.define("this", instance);
-        return new LoxFunction(declaration, environment, isInitializer);
+        return new WalrusFunction(declaration, environment, isInitializer);
     }
 
     @Override
@@ -30,7 +29,7 @@ public record LoxFunction(Statement.Function declaration, Environment closure, b
      * @return Number of required arguments
      */
     @Override
-    public int arity() {
+    public int numberOfArguments() {
         return declaration.getParams().size();
     }
 

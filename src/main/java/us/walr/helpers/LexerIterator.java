@@ -38,7 +38,7 @@
  *
  */
 
-package io.funct.helpers;
+package us.walr.helpers;
 
 import java.text.CharacterIterator;
 

@@ -1,4 +1,4 @@
-package io.funct.internal;
+package us.walr.internal;
 
 /**
  * A Token data class. Contains Token type, its parsed lexeme, literal literal and source code line.
@@ -9,21 +9,25 @@ public record Token(Type type, String lexeme, Object literal, int line) {
      */
     public enum Type {
         // Single-character tokens.
-        LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
-        COMMA, DOT, MINUS, PLUS, SEMICOLON, SLASH, STAR,
+        LEFT_BRACKET, RIGHT_BRACKET, LEFT_PAREN, RIGHT_PAREN,
+        LEFT_BRACE, RIGHT_BRACE, COMMA, DOT, SEMICOLON, SLASH,
 
         // One or two character tokens.
         BANG, BANG_EQUAL,
         EQUAL, EQUAL_EQUAL,
         GREATER, GREATER_EQUAL,
         LESS, LESS_EQUAL,
-        MINUS_MINUS, PLUS_PLUS,
+        MINUS, MINUS_MINUS,
+        PLUS, PLUS_PLUS,
+        STAR, STAR_STAR,
+        PERCENT, SLASH_PERCENT,
+        AND, OR,
 
         // Literals.
         IDENTIFIER, STRING, NUMBER,
 
         // Keywords.
-        AND, CLASS, ELSE, FALSE, FUN, FOR, IF, NIL, OR,
+        CLASS, ELSE, EXTENDS, FALSE, FUNCTION, FOR, IF, NULL,
         PRINT, RETURN, SUPER, THIS, TRUE, VAR, WHILE,
 
         EOF

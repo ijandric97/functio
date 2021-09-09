@@ -1,8 +1,8 @@
-package io.funct;
+package us.walr;
 
-import io.funct.exceptions.RuntimeError;
-import io.funct.grammar.Statement;
-import io.funct.internal.Token;
+import us.walr.exceptions.RuntimeError;
+import us.walr.grammar.Statement;
+import us.walr.internal.Token;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
-public class Lox {
+public class Walrus {
     private static final Interpreter interpreter = new Interpreter();
     /**
      * Any error. This usually means in lexing parsing or while resolving variables (resolver).
@@ -26,7 +26,7 @@ public class Lox {
     private static boolean isREPL = false;
 
     /**
-     * The Main function of the Lox programming language. It either runs a
+     * The Main function of the Walrus programming language. It either runs a
      * REPL mode or executes a file that is passed as CMD param.
      *
      * @param args Filename to run
@@ -38,8 +38,8 @@ public class Lox {
             case 1 -> runFile(args[0]); // Try to run the provided file
             default -> {
                 // We passed too many arguments; display help
-                System.out.println("Usage: jLox [script]");
-                Lox.exit(64);
+                System.out.println("Usage: Walrus [script]");
+                Walrus.exit(64);
             }
         }
     }
@@ -58,8 +58,8 @@ public class Lox {
         run(new String(bytes, Charset.defaultCharset()));
 
         // Indicate an error in the exit code.
-        if (hadError) Lox.exit(65);
-        if (hadRuntimeError) Lox.exit(70);
+        if (hadError) Walrus.exit(65);
+        if (hadRuntimeError) Walrus.exit(70);
     }
 
     /**

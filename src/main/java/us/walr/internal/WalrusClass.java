@@ -1,16 +1,16 @@
-package io.funct.internal;
+package us.walr.internal;
 
-import io.funct.Interpreter;
+import us.walr.Interpreter;
 
 import java.util.List;
 import java.util.Map;
 
-public record LoxClass(String name, LoxClass superclass, Map<String, LoxFunction> methods) implements LoxCallable {
+public record WalrusClass(String name, WalrusClass superclass, Map<String, WalrusFunction> methods) implements WalrusCallable {
     /**
      * @param name Name of the method we are searching for
      * @return Returns the method identifier (callee) which we can then execute
      */
-    public LoxFunction findMethod(String name) {
+    public WalrusFunction findMethod(String name) {
         // Search in current object
         if (methods.containsKey(name)) {
             return methods.get(name);
@@ -41,8 +41,8 @@ public record LoxClass(String name, LoxClass superclass, Map<String, LoxFunction
      */
     @Override
     public Object call(Interpreter interpreter, List<Object> arguments) {
-        LoxInstance instance = new LoxInstance(this);
-        LoxFunction initializer = findMethod("init");
+        WalrusInstance instance = new WalrusInstance(this);
+        WalrusFunction initializer = findMethod("init");
         if (initializer != null) {
             initializer.bind(instance).call(interpreter, arguments);
         }
@@ -54,9 +54,9 @@ public record LoxClass(String name, LoxClass superclass, Map<String, LoxFunction
      * @return Number of arguments needed for constructor
      */
     @Override
-    public int arity() {
-        LoxFunction initializer = findMethod("init");
+    public int numberOfArguments() {
+        WalrusFunction initializer = findMethod("init");
         if (initializer == null) return 0;
-        return initializer.arity();
+        return initializer.numberOfArguments();
     }
 }

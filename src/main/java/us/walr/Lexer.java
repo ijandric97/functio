@@ -1,14 +1,14 @@
-package io.funct;
+package us.walr;
 
-import io.funct.helpers.LexerIterator;
-import io.funct.internal.Token;
+import us.walr.helpers.LexerIterator;
+import us.walr.internal.Token;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static io.funct.internal.Token.Type.*;
+import static us.walr.internal.Token.Type.*;
 
 /**
  * Lexer (also called tokenizer or scanner), takes the input string and splits it into pieces we call tokens.
@@ -19,15 +19,14 @@ public class Lexer {
      * Used to differentiate out statements from identifiers.
      */
     private static final Map<String, Token.Type> keywords = Map.ofEntries(
-            new AbstractMap.SimpleEntry<>("and", AND),
             new AbstractMap.SimpleEntry<>("class", CLASS),
             new AbstractMap.SimpleEntry<>("else", ELSE),
+            new AbstractMap.SimpleEntry<>("extends", EXTENDS),
             new AbstractMap.SimpleEntry<>("false", FALSE),
             new AbstractMap.SimpleEntry<>("for", FOR),
-            new AbstractMap.SimpleEntry<>("fun", FUN),
+            new AbstractMap.SimpleEntry<>("function", FUNCTION),
             new AbstractMap.SimpleEntry<>("if", IF),
-            new AbstractMap.SimpleEntry<>("nil", NIL),
-            new AbstractMap.SimpleEntry<>("or", OR),
+            new AbstractMap.SimpleEntry<>("null", NULL),
             new AbstractMap.SimpleEntry<>("print", PRINT),
             new AbstractMap.SimpleEntry<>("return", RETURN),
             new AbstractMap.SimpleEntry<>("super", SUPER),
@@ -83,6 +82,8 @@ public class Lexer {
             // Parse the current character
             switch (it.current()) {
                 // Single-character tokens
+                case '[' -> addToken(LEFT_BRACKET);
+                case ']' -> addToken(RIGHT_BRACKET);
                 case '(' -> addToken(LEFT_PAREN);
                 case ')' -> addToken(RIGHT_PAREN);
                 case '{' -> addToken(LEFT_BRACE);
@@ -90,15 +91,30 @@ public class Lexer {
                 case ',' -> addToken(COMMA);
                 case '.' -> addToken(DOT);
                 case ';' -> addToken(SEMICOLON);
-                case '*' -> addToken(STAR);
+                case '%' -> addToken(PERCENT);
 
                 // One or two character tokens.
+                case '*' -> addToken(it.matchNextAndAdvance('*') ? STAR_STAR : STAR);
                 case '-' -> addToken(it.matchNextAndAdvance('-') ? MINUS_MINUS : MINUS);
                 case '+' -> addToken(it.matchNextAndAdvance('+') ? PLUS_PLUS : PLUS);
                 case '!' -> addToken(it.matchNextAndAdvance('=') ? BANG_EQUAL : BANG);
                 case '=' -> addToken(it.matchNextAndAdvance('=') ? EQUAL_EQUAL : EQUAL);
                 case '<' -> addToken(it.matchNextAndAdvance('=') ? LESS_EQUAL : LESS);
                 case '>' -> addToken(it.matchNextAndAdvance('=') ? GREATER_EQUAL : GREATER);
+                case '&' -> {
+                    if (it.matchNextAndAdvance('&')) {
+                        addToken(AND);
+                    } else {
+                        Walrus.error(line, "Unexpected character.");
+                    }
+                }
+                case '|' -> {
+                    if (it.matchNextAndAdvance('|')) {
+                        addToken(OR);
+                    } else {
+                        Walrus.error(line, "Unexpected character.");
+                    }
+                }
                 case '/' -> {
                     if (it.matchNextAndAdvance('*')) {
                         multiLineComment();
@@ -106,6 +122,8 @@ public class Lexer {
                         // This is a single-line comment
                         // Advance until either EOF or newline has been reached
                         while (!it.isEOF() && it.peekNext() != '\n') it.next();
+                    } else if (it.matchNextAndAdvance('%')) {
+                        addToken(SLASH_PERCENT);
                     } else {
                         addToken(SLASH);
                     }
@@ -125,7 +143,7 @@ public class Lexer {
                         identifier();
                     } else {
                         // Something went wrong, throw an ERROR
-                        Lox.error(line, "Unexpected character.");
+                        Walrus.error(line, "Unexpected character.");
                     }
                 }
             }
@@ -191,7 +209,7 @@ public class Lexer {
 
         // EOF was reached which means we did not close the string
         if (it.isEOF()) {
-            Lox.error(line, "Unterminated string.");
+            Walrus.error(line, "Unterminated string.");
             return;
         }
 
@@ -216,7 +234,7 @@ public class Lexer {
 
         // EOF was reached which means we did not close the comment, throw an error
         if (it.isEOF()) {
-            Lox.error(line, "Unterminated multi-line comment.");
+            Walrus.error(line, "Unterminated multi-line comment.");
         }
 
         it.next(2); // Everything is ok, consume the end */ characters

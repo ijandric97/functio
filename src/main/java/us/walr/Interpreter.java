@@ -1,18 +1,18 @@
-package io.funct;
+package us.walr;
 
-import io.funct.exceptions.Return;
-import io.funct.exceptions.RuntimeError;
-import io.funct.grammar.Expression;
-import io.funct.grammar.Statement;
-import io.funct.helpers.StandardLibrary;
-import io.funct.internal.*;
+import us.walr.exceptions.Return;
+import us.walr.exceptions.RuntimeError;
+import us.walr.grammar.Expression;
+import us.walr.grammar.Statement;
+import us.walr.helpers.StandardLibrary;
+import us.walr.internal.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static io.funct.helpers.InterpreterHelper.*;
+import static us.walr.helpers.InterpreterHelper.*;
 
 public class Interpreter implements Expression.Visitor<Object>, Statement.Visitor<Void> {
     /**
@@ -32,12 +32,18 @@ public class Interpreter implements Expression.Visitor<Object>, Statement.Visito
 
     Interpreter() {
         // Default functions
+        globals.define("abs", new StandardLibrary.abs());
         globals.define("clock", new StandardLibrary.clock());
         globals.define("exit", new StandardLibrary.exit());
         globals.define("println", new StandardLibrary.println());
-        globals.define("abs", new StandardLibrary.abs());
+        globals.define("input", new StandardLibrary.input());
         globals.define("rand", new StandardLibrary.rand());
         globals.define("pow", new StandardLibrary.pow());
+        globals.define("sqrt", new StandardLibrary.sqrt());
+        globals.define("round", new StandardLibrary.round());
+        globals.define("string", new StandardLibrary.string());
+        globals.define("number", new StandardLibrary.number());
+        globals.define("array", new StandardLibrary.array());
     }
 
     /**
@@ -51,7 +57,7 @@ public class Interpreter implements Expression.Visitor<Object>, Statement.Visito
                 executeStatement(statement);
             }
         } catch (RuntimeError error) {
-            Lox.runtimeError(error);
+            Walrus.runtimeError(error);
         }
     }
 
@@ -151,7 +157,7 @@ public class Interpreter implements Expression.Visitor<Object>, Statement.Visito
             // We do have a superclass defined, therefore grab it's variable
             superclass = executeExpression(statement.getSuperclass());
             // If superclass has not been defined, or it is not a class, throw an error
-            if (!(superclass instanceof LoxClass)) {
+            if (!(superclass instanceof WalrusClass)) {
                 throw new RuntimeError(statement.getSuperclass().getName(), "Superclass must be a class.");
             }
         }
@@ -167,14 +173,14 @@ public class Interpreter implements Expression.Visitor<Object>, Statement.Visito
         }
 
         // Map the method definitions to a hashmap
-        Map<String, LoxFunction> methods = new HashMap<>();
+        Map<String, WalrusFunction> methods = new HashMap<>();
         for (Statement.Function method : statement.getMethods()) {
-            LoxFunction function = new LoxFunction(method, environment, method.getName().lexeme().equals("init"));
+            WalrusFunction function = new WalrusFunction(method, environment, method.getName().lexeme().equals("init"));
             methods.put(method.getName().lexeme(), function);
         }
 
-        // Finally, create an internal Lox Class object
-        LoxClass loxClass = new LoxClass(statement.getName().lexeme(), (LoxClass) superclass, methods);
+        // Finally, create an internal Walrus Class object
+        WalrusClass walrusClass = new WalrusClass(statement.getName().lexeme(), (WalrusClass) superclass, methods);
 
         // If a superclass exists, that means that we had to create a local environment to reference the superclass
         // therefore we should "pop" that environment and get back to the original one
@@ -183,7 +189,7 @@ public class Interpreter implements Expression.Visitor<Object>, Statement.Visito
         }
 
         // Add class to the environment
-        environment.assign(statement.getName(), loxClass);
+        environment.assign(statement.getName(), walrusClass);
         return null;
     }
 
@@ -208,7 +214,7 @@ public class Interpreter implements Expression.Visitor<Object>, Statement.Visito
      */
     @Override
     public Void visitFunctionStatement(Statement.Function statement) {
-        LoxFunction function = new LoxFunction(statement, environment, false);
+        WalrusFunction function = new WalrusFunction(statement, environment, false);
         environment.define(statement.getName().lexeme(), function);
         return null;
     }
@@ -383,6 +389,18 @@ public class Interpreter implements Expression.Visitor<Object>, Statement.Visito
                 checkNumberOperands(expression.getOperator(), left, right);
                 return (double) left * (double) right;
             }
+            case STAR_STAR -> {
+                checkNumberOperands(expression.getOperator(), left, right);
+                return Math.pow((double)left, (double)right);
+            }
+            case PERCENT -> {
+                checkNumberOperands(expression.getOperator(), left, right);
+                return (double) left % (double) right;
+            }
+            case SLASH_PERCENT -> {
+                checkNumberOperands(expression.getOperator(), left, right);
+                return Math.floor((double) left / (double) right);
+            }
         }
 
         // This should be unreachable.
@@ -398,10 +416,10 @@ public class Interpreter implements Expression.Visitor<Object>, Statement.Visito
     @Override
     public Object visitCallExpression(Expression.Call expression) {
         // Evaluate the callee definition and check if its result is an identifier that points to a
-        // LoxCallable object (e.g. example: a returning pointer to b, being callable as a()();)
+        // WalrusCallable object (e.g. example: a returning pointer to b, being callable as a()();)
         // If callee does not reference a function, throw an error
         Object callee = executeExpression(expression.getCallee());
-        if (!(callee instanceof LoxCallable function)) {
+        if (!(callee instanceof WalrusCallable function)) {
             throw new RuntimeError(expression.getParen(), "Can only call functions and classes.");
         }
 
@@ -412,11 +430,13 @@ public class Interpreter implements Expression.Visitor<Object>, Statement.Visito
         }
 
         // Check if number of arguments does not match the requested number of arguments
-        if (arguments.size() != function.arity()) {
+        if (arguments.size() != function.numberOfArguments()) {
             throw new RuntimeError(expression.getParen(), "Expected " +
-                    function.arity() + " arguments but got " +
+                    function.numberOfArguments() + " arguments but got " +
                     arguments.size() + ".");
         }
+
+        arguments.add(expression.getParen());
 
         return function.call(this, arguments); // Execute the function and return its value
     }
@@ -432,8 +452,8 @@ public class Interpreter implements Expression.Visitor<Object>, Statement.Visito
         // Execute expression ot get the name of the object
         Object object = executeExpression(expression.getObject());
         // If that name is an object, then return the value
-        if (object instanceof LoxInstance) {
-            return ((LoxInstance) object).get(expression.getName());
+        if (object instanceof WalrusInstance) {
+            return ((WalrusInstance) object).get(expression.getName());
         }
         // Turns out that it is not an object, throw an error
         throw new RuntimeError(expression.getName(), "Only instances have properties.");
@@ -497,13 +517,13 @@ public class Interpreter implements Expression.Visitor<Object>, Statement.Visito
         Object object = executeExpression(expression.getObject());
 
         // If that object is not actually an object or perhaps a variable, throw an error
-        if (!(object instanceof LoxInstance)) {
+        if (!(object instanceof WalrusInstance)) {
             throw new RuntimeError(expression.getName(), "Only instances have fields.");
         }
 
         // Add the attribute value to the object
         Object value = executeExpression(expression.getValue());
-        ((LoxInstance) object).set(expression.getName(), value);
+        ((WalrusInstance) object).set(expression.getName(), value);
         return value;
     }
 
@@ -517,13 +537,13 @@ public class Interpreter implements Expression.Visitor<Object>, Statement.Visito
     public Object visitSuperExpression(Expression.Super expression) {
         // Get the reference to the superclass from the current local environment
         int depth = locals.get(expression);
-        LoxClass superclass = (LoxClass) environment.getAt(depth, "super");
+        WalrusClass superclass = (WalrusClass) environment.getAt(depth, "super");
 
         // Get the reference to the object (hence, depth-1)
-        LoxInstance object = (LoxInstance) environment.getAt(depth - 1, "this");
+        WalrusInstance object = (WalrusInstance) environment.getAt(depth - 1, "this");
 
         // Get reference to the method we want to call
-        LoxFunction method = superclass.findMethod(expression.getMethod().lexeme());
+        WalrusFunction method = superclass.findMethod(expression.getMethod().lexeme());
 
         // If that method does not exist, throw an error
         if (method == null) {

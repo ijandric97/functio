@@ -1,8 +1,8 @@
-package io.funct;
+package us.walr;
 
-import io.funct.grammar.Expression;
-import io.funct.grammar.Statement;
-import io.funct.internal.Token;
+import us.walr.grammar.Expression;
+import us.walr.grammar.Statement;
+import us.walr.internal.Token;
 
 import java.util.HashMap;
 import java.util.List;
@@ -89,7 +89,7 @@ class Resolver implements Expression.Visitor<Void>, Statement.Visitor<Void> {
 
         Map<String, Boolean> scope = scopes.peek();
         if (scope.containsKey(name.lexeme())) {
-            Lox.error(name, "Already a variable with this name in this scope.");
+            Walrus.error(name, "Already a variable with this name in this scope.");
         }
 
         scope.put(name.lexeme(), false);
@@ -126,7 +126,7 @@ class Resolver implements Expression.Visitor<Void>, Statement.Visitor<Void> {
         define(statement.getName());
 
         if (statement.getSuperclass() != null && statement.getName().lexeme().equals(statement.getSuperclass().getName().lexeme())) {
-            Lox.error(statement.getSuperclass().getName(), "A class can't inherit from itself.");
+            Walrus.error(statement.getSuperclass().getName(), "A class can't inherit from itself.");
         }
 
         if (statement.getSuperclass() != null) {
@@ -192,12 +192,12 @@ class Resolver implements Expression.Visitor<Void>, Statement.Visitor<Void> {
     @Override
     public Void visitReturnStatement(Statement.Return statement) {
         if (currentFunction == FunctionType.NONE) {
-            Lox.error(statement.getKeyword(), "Can't return from top-level code.");
+            Walrus.error(statement.getKeyword(), "Can't return from top-level code.");
         }
 
         if (statement.getValue() != null) {
             if (currentFunction == FunctionType.INITIALIZER) {
-                Lox.error(statement.getKeyword(), "Can't return a literal from an initializer.");
+                Walrus.error(statement.getKeyword(), "Can't return a literal from an initializer.");
             }
 
             resolve(statement.getValue());
@@ -282,9 +282,9 @@ class Resolver implements Expression.Visitor<Void>, Statement.Visitor<Void> {
     @Override
     public Void visitSuperExpression(Expression.Super expression) {
         if (currentClass == ClassType.NONE) {
-            Lox.error(expression.getKeyword(), "Can't use 'super' outside of a class.");
+            Walrus.error(expression.getKeyword(), "Can't use 'super' outside of a class.");
         } else if (currentClass != ClassType.SUBCLASS) {
-            Lox.error(expression.getKeyword(), "Can't use 'super' in a class with no superclass.");
+            Walrus.error(expression.getKeyword(), "Can't use 'super' in a class with no superclass.");
         }
 
         resolveLocal(expression, expression.getKeyword());
@@ -294,7 +294,7 @@ class Resolver implements Expression.Visitor<Void>, Statement.Visitor<Void> {
     @Override
     public Void visitThisExpression(Expression.This expression) {
         if (currentClass == ClassType.NONE) {
-            Lox.error(expression.getKeyword(),
+            Walrus.error(expression.getKeyword(),
                     "Can't use 'this' outside of a class.");
             return null;
         }
@@ -313,7 +313,7 @@ class Resolver implements Expression.Visitor<Void>, Statement.Visitor<Void> {
     public Void visitVariableExpression(Expression.Variable expression) {
         if (!scopes.isEmpty() &&
                 scopes.peek().get(expression.getName().lexeme()) == Boolean.FALSE) {
-            Lox.error(expression.getName(), "Can't read local variable in its own initializer.");
+            Walrus.error(expression.getName(), "Can't read local variable in its own initializer.");
         }
 
         resolveLocal(expression, expression.getName());

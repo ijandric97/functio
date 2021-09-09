@@ -1,16 +1,16 @@
-package io.funct;
+package us.walr;
 
-import io.funct.exceptions.ParseError;
-import io.funct.grammar.Expression;
-import io.funct.grammar.Statement;
-import io.funct.helpers.ParserHelper;
-import io.funct.internal.Token;
+import us.walr.exceptions.ParseError;
+import us.walr.grammar.Expression;
+import us.walr.grammar.Statement;
+import us.walr.helpers.ParserHelper;
+import us.walr.internal.Token;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static io.funct.internal.Token.Type.*;
+import static us.walr.internal.Token.Type.*;
 
 class Parser {
     /**
@@ -49,7 +49,7 @@ class Parser {
         // statement declarations (which indicate start of the new statement).
         while (!ph.isEOF() &&
                 ph.peekPrevious().type() != SEMICOLON &&
-                !ph.match(CLASS, FUN, VAR, FOR, IF, WHILE, PRINT, RETURN)) {
+                !ph.match(CLASS, FUNCTION, VAR, FOR, IF, WHILE, PRINT, RETURN)) {
             ph.advance();
         }
     }
@@ -70,7 +70,7 @@ class Parser {
     private Statement declaration() {
         try {
             if (ph.matchAndAdvance(CLASS)) return classDeclaration();
-            if (ph.matchAndAdvance(FUN)) return function("function");
+            if (ph.matchAndAdvance(FUNCTION)) return function("function");
             if (ph.matchAndAdvance(VAR)) return variableDeclaration();
 
             return statement();
@@ -93,7 +93,7 @@ class Parser {
 
         // Check if there is inheritance
         Expression.Variable superclass = null;
-        if (ph.matchAndAdvance(LESS)) {
+        if (ph.matchAndAdvance(EXTENDS)) {
             ph.advance(IDENTIFIER, "Expect superclass name.");
             superclass = new Expression.Variable(ph.peekPrevious());
         }
@@ -109,7 +109,7 @@ class Parser {
 
     /**
      * Grammar:
-     * functionDeclaration -> "fun" function ; // This part already consumed by the declaration().
+     * functionDeclaration -> "function" function ; // This part already consumed by the declaration().
      * function -> IDENTIFIER "(" parameters? ")" block ;
      * parameters -> IDENTIFIER ( "," IDENTIFIER )* ;
      *
@@ -370,7 +370,7 @@ class Parser {
      * A logical or operator (for example: var1 or var2)
      * <p>
      * Grammar:
-     * logic_or -> logic_and ( "or" logic_and )* ;
+     * logic_or -> logic_and ( "||" logic_and )* ;
      *
      * @return Syntax tree
      */
@@ -389,7 +389,7 @@ class Parser {
 
     /**
      * Grammar:
-     * logic_and -> equality ( "and" equality )* ;
+     * logic_and -> equality ( "&&" equality )* ;
      *
      * @return Syntax tree
      */
@@ -486,14 +486,34 @@ class Parser {
      * Takes care of the left associated Factor ("/", "*") objects.
      * <p>
      * Grammar:
-     * factor -> unary ( ( "/" | "*" ) unary )* ;
+     * factor -> power ( ( "/" | "*" | "%" ) power )* ;
      *
      * @return Syntax tree
      */
     private Expression factor() {
+        Expression expression = power(); // Evaluate the higher priority operations
+
+        while (ph.matchAndAdvance(SLASH, STAR, SLASH_PERCENT, PERCENT)) {
+            Token operator = ph.peekPrevious(); // Save the operator
+            Expression right = power();
+            expression = new Expression.Binary(expression, operator, right);
+        }
+
+        return expression;
+    }
+
+    /**
+     * Takes care of the left associated Power ("**") objects.
+     *
+     * Grammar:
+     * power -> unary ( ("**") unary )* ;
+     *
+     * @return Syntax tree
+     */
+    private Expression power() {
         Expression expression = unary(); // Evaluate the higher priority operations
 
-        while (ph.matchAndAdvance(SLASH, STAR)) {
+        while (ph.matchAndAdvance(STAR_STAR)) {
             Token operator = ph.peekPrevious(); // Save the operator
             Expression right = unary();
             expression = new Expression.Binary(expression, operator, right);
@@ -541,7 +561,7 @@ class Parser {
                 List<Expression> arguments = new ArrayList<>();
                 if (!ph.match(RIGHT_PAREN)) { // If there are indeed arguments
                     do { // Loop and add them to the list
-                        // Java limits arguments to 255, therefore We inherited this in Lox too
+                        // Java limits arguments to 255, therefore We inherited this in Walrus too
                         if (arguments.size() >= 255)
                             throw ph.error(ph.current(), "Can't have more than 255 arguments.");
                         arguments.add(expression());
@@ -567,10 +587,10 @@ class Parser {
 
     /**
      * Highest precedence part of the Recursive Descent Parsing which takes care of the primary objects which contain
-     * all literals (NUMBER, STRING, BOOLEAN, NIL) and grouping operators ("(", ")").
+     * all literals (NUMBER, STRING, BOOLEAN, NULL) and grouping operators ("(", ")").
      * <p>
      * Grammar:
-     * primary -> "true" | "false" | "nil" | "this" | NUMBER | STRING | IDENTIFIER | "(" expression ")" | "super" "." IDENTIFIER ;
+     * primary -> "true" | "false" | "null" | "this" | NUMBER | STRING | IDENTIFIER | "(" expression ")" | "super" "." IDENTIFIER ;
      *
      * @return Syntax tree
      */
@@ -578,7 +598,7 @@ class Parser {
         // Match the boolean and null values
         if (ph.matchAndAdvance(FALSE)) return new Expression.Literal(false);
         if (ph.matchAndAdvance(TRUE)) return new Expression.Literal(true);
-        if (ph.matchAndAdvance(NIL)) return new Expression.Literal(null);
+        if (ph.matchAndAdvance(NULL)) return new Expression.Literal(null);
 
         // Match numbers and strings
         if (ph.matchAndAdvance(NUMBER, STRING)) return new Expression.Literal(ph.peekPrevious().literal());

@@ -1,6 +1,6 @@
-package io.funct.exceptions;
+package us.walr.exceptions;
 
-import io.funct.internal.Token;
+import us.walr.internal.Token;
 
 /**
  * Thrown when interpreter cannot interpret something

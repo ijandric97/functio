@@ -1,4 +1,4 @@
-package io.funct.exceptions;
+package us.walr.exceptions;
 
 public class Return extends RuntimeException {
     /**

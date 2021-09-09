@@ -1,6 +1,6 @@
-package io.funct.internal;
+package us.walr.internal;
 
-import io.funct.exceptions.RuntimeError;
+import us.walr.exceptions.RuntimeError;
 
 import java.util.HashMap;
 import java.util.Map;

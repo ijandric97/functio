@@ -1,6 +1,6 @@
-package io.funct.grammar;
+package us.walr.grammar;
 
-import io.funct.internal.Token;
+import us.walr.internal.Token;
 
 import java.util.List;
 

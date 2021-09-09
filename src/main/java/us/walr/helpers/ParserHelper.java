@@ -1,8 +1,8 @@
-package io.funct.helpers;
+package us.walr.helpers;
 
-import io.funct.Lox;
-import io.funct.exceptions.ParseError;
-import io.funct.internal.Token;
+import us.walr.Walrus;
+import us.walr.exceptions.ParseError;
+import us.walr.internal.Token;
 
 import java.util.List;
 import java.util.ListIterator;
@@ -120,7 +120,7 @@ public class ParserHelper {
     }
 
     /**
-     * Report an error to the user and the internal Lox error system.
+     * Report an error to the user and the internal Walrus error system.
      *
      * @param token   Token at which the error happened.
      * @param message The error message.
@@ -128,7 +128,7 @@ public class ParserHelper {
      * ignore it and try to find a synchronization point which will allow us to continue parsing.
      */
     public ParseError error(Token token, String message) {
-        Lox.error(token, message);
+        Walrus.error(token, message);
         return new ParseError();
     }
 }

@@ -1,4 +1,4 @@
-package io.funct.exceptions;
+package us.walr.exceptions;
 
 /**
  * Thrown when we wish to reset the parser

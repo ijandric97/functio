@@ -1,6 +1,6 @@
-package io.funct.grammar;
+package us.walr.grammar;
 
-import io.funct.internal.Token;
+import us.walr.internal.Token;
 
 import java.util.List;
 
@@ -46,10 +46,10 @@ public abstract class Statement {
 
     public static class Class extends Statement {
         final Token name;
-        final io.funct.grammar.Expression.Variable superclass;
+        final us.walr.grammar.Expression.Variable superclass;
         final List<Statement.Function> methods;
 
-        public Class(Token name, io.funct.grammar.Expression.Variable superclass, List<Statement.Function> methods) {
+        public Class(Token name, us.walr.grammar.Expression.Variable superclass, List<Statement.Function> methods) {
             this.name = name;
             this.superclass = superclass;
             this.methods = methods;
@@ -64,7 +64,7 @@ public abstract class Statement {
             return name;
         }
 
-        public io.funct.grammar.Expression.Variable getSuperclass() {
+        public us.walr.grammar.Expression.Variable getSuperclass() {
             return superclass;
         }
 
@@ -74,9 +74,9 @@ public abstract class Statement {
     }
 
     public static class Expression extends Statement {
-        final io.funct.grammar.Expression expression;
+        final us.walr.grammar.Expression expression;
 
-        public Expression(io.funct.grammar.Expression expression) {
+        public Expression(us.walr.grammar.Expression expression) {
             this.expression = expression;
         }
 
@@ -85,7 +85,7 @@ public abstract class Statement {
             return visitor.visitExpressionStatement(this);
         }
 
-        public io.funct.grammar.Expression getExpression() {
+        public us.walr.grammar.Expression getExpression() {
             return expression;
         }
     }
@@ -120,11 +120,11 @@ public abstract class Statement {
     }
 
     public static class If extends Statement {
-        final io.funct.grammar.Expression condition;
+        final us.walr.grammar.Expression condition;
         final Statement thenBranch;
         final Statement elseBranch;
 
-        public If(io.funct.grammar.Expression condition, Statement thenBranch, Statement elseBranch) {
+        public If(us.walr.grammar.Expression condition, Statement thenBranch, Statement elseBranch) {
             this.condition = condition;
             this.thenBranch = thenBranch;
             this.elseBranch = elseBranch;
@@ -135,7 +135,7 @@ public abstract class Statement {
             return visitor.visitIfStatement(this);
         }
 
-        public io.funct.grammar.Expression getCondition() {
+        public us.walr.grammar.Expression getCondition() {
             return condition;
         }
 
@@ -149,9 +149,9 @@ public abstract class Statement {
     }
 
     public static class Print extends Statement {
-        final io.funct.grammar.Expression expression;
+        final us.walr.grammar.Expression expression;
 
-        public Print(io.funct.grammar.Expression expression) {
+        public Print(us.walr.grammar.Expression expression) {
             this.expression = expression;
         }
 
@@ -160,16 +160,16 @@ public abstract class Statement {
             return visitor.visitPrintStatement(this);
         }
 
-        public io.funct.grammar.Expression getExpression() {
+        public us.walr.grammar.Expression getExpression() {
             return expression;
         }
     }
 
     public static class Return extends Statement {
         final Token keyword;
-        final io.funct.grammar.Expression value;
+        final us.walr.grammar.Expression value;
 
-        public Return(Token keyword, io.funct.grammar.Expression value) {
+        public Return(Token keyword, us.walr.grammar.Expression value) {
             this.keyword = keyword;
             this.value = value;
         }
@@ -183,16 +183,16 @@ public abstract class Statement {
             return keyword;
         }
 
-        public io.funct.grammar.Expression getValue() {
+        public us.walr.grammar.Expression getValue() {
             return value;
         }
     }
 
     public static class Variable extends Statement {
         final Token name;
-        final io.funct.grammar.Expression initializer;
+        final us.walr.grammar.Expression initializer;
 
-        public Variable(Token name, io.funct.grammar.Expression initializer) {
+        public Variable(Token name, us.walr.grammar.Expression initializer) {
             this.name = name;
             this.initializer = initializer;
         }
@@ -206,16 +206,16 @@ public abstract class Statement {
             return name;
         }
 
-        public io.funct.grammar.Expression getInitializer() {
+        public us.walr.grammar.Expression getInitializer() {
             return initializer;
         }
     }
 
     public static class While extends Statement {
-        final io.funct.grammar.Expression condition;
+        final us.walr.grammar.Expression condition;
         final Statement body;
 
-        public While(io.funct.grammar.Expression condition, Statement body) {
+        public While(us.walr.grammar.Expression condition, Statement body) {
             this.condition = condition;
             this.body = body;
         }
@@ -225,7 +225,7 @@ public abstract class Statement {
             return visitor.visitWhileStatement(this);
         }
 
-        public io.funct.grammar.Expression getCondition() {
+        public us.walr.grammar.Expression getCondition() {
             return condition;
         }
 

@@ -1,14 +1,14 @@
-package io.funct.internal;
+package us.walr.internal;
 
-import io.funct.Interpreter;
+import us.walr.Interpreter;
 
 import java.util.List;
 
-public interface LoxCallable {
+public interface WalrusCallable {
     /**
      * @return Number of arguments required
      */
-    int arity();
+    int numberOfArguments();
 
 
     /**

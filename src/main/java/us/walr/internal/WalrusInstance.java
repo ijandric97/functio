@@ -1,16 +1,16 @@
-package io.funct.internal;
+package us.walr.internal;
 
-import io.funct.exceptions.RuntimeError;
+import us.walr.exceptions.RuntimeError;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class LoxInstance {
-    private final LoxClass loxClass;
+public class WalrusInstance {
+    private final WalrusClass walrusClass;
     private final Map<String, Object> fields = new HashMap<>();
 
-    LoxInstance(LoxClass klass) {
-        this.loxClass = klass;
+    WalrusInstance(WalrusClass klass) {
+        this.walrusClass = klass;
     }
 
     /**
@@ -24,7 +24,7 @@ public class LoxInstance {
             return fields.get(name.lexeme());
         }
 
-        LoxFunction method = loxClass.findMethod(name.lexeme());
+        WalrusFunction method = walrusClass.findMethod(name.lexeme());
         if (method != null) return method.bind(this);
 
         throw new RuntimeError(name, "Undefined property '" + name.lexeme() + "'.");
@@ -45,6 +45,6 @@ public class LoxInstance {
      */
     @Override
     public String toString() {
-        return loxClass.name() + " instance";
+        return walrusClass.name() + " instance";
     }
 }

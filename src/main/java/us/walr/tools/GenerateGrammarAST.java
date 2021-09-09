@@ -1,4 +1,4 @@
-package io.funct.tools;
+package us.walr.tools;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -39,14 +39,14 @@ public class GenerateGrammarAST {
         // Generate the Statement.java file
         generateGrammarASTClass(outputDir, "Statement", Arrays.asList(
                 "Block      : List<Statement> statements",
-                "Class      : Token name, io.funct.grammar.Expression.Variable superclass," + " List<Statement.Function> methods",
-                "Expression : io.funct.grammar.Expression expression",
-                "Function   : Token name, List<Token> params," + " List<Statement> body",
-                "If         : io.funct.grammar.Expression condition, Statement thenBranch," + " Statement elseBranch",
-                "Print      : io.funct.grammar.Expression expression",
-                "Return     : Token keyword, io.funct.grammar.Expression value",
-                "Variable   : Token name, io.funct.grammar.Expression initializer",
-                "While      : io.funct.grammar.Expression condition, Statement body"
+                "Class      : Token name, Expression.Variable superclass, List<Statement.Function> methods",
+                "Expression : Expression expression",
+                "Function   : Token name, List<Token> params, List<Statement> body",
+                "If         : Expression condition, Statement thenBranch, Statement elseBranch",
+                "Print      : Expression expression",
+                "Return     : Token keyword, Expression value",
+                "Variable   : Token name, Expression initializer",
+                "While      : Expression condition, Statement body"
         ));
     }
 
@@ -65,9 +65,9 @@ public class GenerateGrammarAST {
 
         // Write package, imports and class name
         writer.print("""
-                package io.funct.grammar;
+                package us.walr.grammar;
                                 
-                import io.funct.records.Token;
+                import us.walr.records.Token;
                                 
                 import java.util.List;
                                 
